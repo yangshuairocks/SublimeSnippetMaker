@@ -14,6 +14,12 @@ template = """<snippet>
 </snippet>"""
 
 
+def slugify(value):
+    import string
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    return ''.join(c for c in value if c in valid_chars)
+
+
 def get_snippets():
     settings = sublime.load_settings('SnippetMaker.sublime-settings')
     location = settings.get('snippet_location', 'Snippets')
