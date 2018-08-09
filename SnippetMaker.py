@@ -15,6 +15,8 @@ template = """<snippet>
 
 
 def slugify(value):
+    if value == None:
+        return None 
     import string
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
     return ''.join(c for c in value if c in valid_chars)
@@ -77,13 +79,23 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
         self.ask_file_name()
 
     def ask_file_name(self):
-        self.view.window().show_input_panel(
+        import re
+        file_type = re.search(r"/([^/]+?)\.sublime-syntax", self.view.settings().get("syntax")).group(1)
+        file_type = slugify(file_type) or "_"
+        snippet_name = file_type + ".[" + slugify(self.trigger + " - " + self.description) + '].sublime-snippet'
+
+        input_view = self.view.window().show_input_panel(
             'File Name',
-            self.trigger + '.sublime-snippet',
+            snippet_name,
             self.make_snippet,
             None,
             None
         )
+        input_selection = input_view.sel()
+        input_selection.clear()
+        input_selection.add(sublime.Region(len(file_type) + 2, len(snippet_name) - 17))
+        # input_view.run_command("invert_selection")
+
 
     def make_snippet(self, file_name):
         settings = sublime.load_settings('SnippetMaker.sublime-settings')
