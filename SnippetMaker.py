@@ -80,7 +80,8 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
 
     def ask_file_name(self):
         import re
-        file_type = re.search(r"/([^/]+?)\.sublime-syntax", self.view.settings().get("syntax")).group(1)
+        print(self.view.settings().get("syntax"))
+        file_type = re.search(r"Packages/([^/]+?)/", self.view.settings().get("syntax")).group(1)
         file_type = slugify(file_type) or "_"
         snippet_name = file_type + ".[" + slugify(self.trigger + " - " + self.description) + '].sublime-snippet'
 
