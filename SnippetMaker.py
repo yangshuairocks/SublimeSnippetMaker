@@ -65,14 +65,15 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
         self.scopes = self.view.scope_name(
             self.view.sel()[0].begin()
         ).strip().replace(' ', ', ')
-        self.view.window().show_input_panel(
+        input_view = self.view.window().show_input_panel(
             'Escape special characters (generally the answer should be "yes")? ',
             "yes",
             self.escape_special_snippet_characters,
             None,
             None
         )
-
+        input_selection = input_view.sel()
+        input_view.run_command("select_all")
 
     def escape_special_snippet_characters(self, do_escape):
         if do_escape == "yes":
@@ -105,7 +106,6 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
         input_selection = input_view.sel()
         input_selection.clear()
         input_selection.add(sublime.Region(len(file_type) + 2, len(snippet_name) - 17))
-        # input_view.run_command("invert_selection")
 
 
     def make_snippet(self, file_name):
