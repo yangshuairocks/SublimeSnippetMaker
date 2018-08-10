@@ -1,5 +1,4 @@
-import os
-import glob
+import os, re, glob
 
 import sublime
 import sublime_plugin
@@ -63,12 +62,24 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
 
     def set_description(self, description):
         self.description = description
-        scopes = self.view.scope_name(
+        self.scopes = self.view.scope_name(
             self.view.sel()[0].begin()
         ).strip().replace(' ', ', ')
         self.view.window().show_input_panel(
+            'Escape special characters (generally the answer should be "yes")? ',
+            "yes",
+            self.escape_special_snippet_characters,
+            None,
+            None
+        )
+
+
+    def escape_special_snippet_characters(self, do_escape):
+        if do_escape == "yes":
+            self.snippet_text = re.sub('\]\]>', "]]$NOT_DEFINED>", re.sub('\$', "\$", self.snippet_text))
+        self.view.window().show_input_panel(
             'Scope',
-            scopes,
+            self.scopes,
             self.set_scopes,
             None,
             None
@@ -79,7 +90,6 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
         self.ask_file_name()
 
     def ask_file_name(self):
-        import re
         print(self.view.settings().get("syntax"))
         file_type = re.search(r"Packages/([^/]+?)/", self.view.settings().get("syntax")).group(1)
         file_type = slugify(file_type) or "_"
