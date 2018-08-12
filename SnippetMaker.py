@@ -101,6 +101,7 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
         file_type = re.search(r"Packages/([^/]+?)/", self.view.settings().get("syntax")).group(1)
         file_type = slugify(file_type) or "_"
         snippet_name = file_type + ".[" + slugify(self.trigger + " - " + self.description) + '].sublime-snippet'
+        snippet_name = re.sub(r'([ \t])\1+', "\g<1>", snippet_name)
 
         input_view = self.view.window().show_input_panel(
             'File Name',
