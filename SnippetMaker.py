@@ -78,13 +78,19 @@ class MakeSnippetCommand(sublime_plugin.TextCommand):
     def escape_special_snippet_characters(self, do_escape):
         if do_escape == "yes":
             self.snippet_text = re.sub('\]\]>', "]]$NOT_DEFINED>", re.sub('\$', "\$", self.snippet_text))
-        self.view.window().show_input_panel(
+        input_view = self.view.window().show_input_panel(
             'Scope',
             self.scopes,
             self.set_scopes,
             None,
             None
         )
+
+        first_comma_index = self.scopes.find(",")
+        if first_comma_index > -1:
+            input_selection = input_view.sel()
+            input_selection.clear()
+            input_selection.add(sublime.Region(first_comma_index, len(self.scopes)))
 
     def set_scopes(self, scopes):
         self.scopes = scopes
